@@ -1,0 +1,57 @@
+# CAMP Treasury Watcher — Custom OpenHuman agent
+# Drop into ~/.openhuman/agents/camp_treasury_watcher.toml after first-run.
+#
+# Purpose: monitor Base mainnet for the 3 governance handoff transactions
+# the operator (deployer EOA + Governor multisig) must execute before the
+# CAMP yield distribution pipeline is functional. Escalates the moment
+# each lands.
+#
+# Watched conditions (from ECOSYSTEM_AUDIT.md Phase 2 findings):
+#   1. CampInsuranceFund.usdcaContract() == 0x36102d7ca5b85df1c4e8a4c0e0e633585186b029
+#      (currently 0x0 → fund non-functional)
+#   2. USDca.owner() == 0x28e7ccdca51a365a9b9b0fffa22fde660e49846f
+#      (Governor multisig; currently still deployer EOA)
+#   3. YieldDistributor.hasRole(DEFAULT_ADMIN_ROLE, deployer) == false
+#      (deployer EOA must renounce after Governor grant)
+#
+# Read-only Day 1. Uses wallet_* tools for on-chain reads only — NEVER
+# wallet_execute_prepared. Outputs go to the memory tree + Discord on
+# state-change.
+
+id = "camp_treasury_watcher"
+display_name = "CAMP Treasury Watcher"
+delegate_name = "watch_camp_governance"
+when_to_use = "On-chain watcher for the 3 CAMP governance handoff transactions on Base mainnet. Use periodically (cron-driven) to check whether the deployer EOA → Governor multisig transfer has completed. Read-only — never executes transactions, only reads contract state and reports changes."
+
+temperature = 0.2
+max_iterations = 6
+sandbox_mode = "none"
+
+omit_identity = true
+omit_memory_context = false
+omit_safety_preamble = false
+omit_skills_catalog = true
+
+[model]
+# Watcher work is read-then-report — fast chat tier is enough.
+hint = "chat"
+
+[tools]
+# Read-only Base mainnet surface. Explicitly NO wallet_execute_prepared.
+named = [
+    "wallet_status",
+    "wallet_balances",
+    "wallet_chain_status",
+    "wallet_prepare_contract_call", # read-only simulation use only
+    # Memory writes so each watcher run leaves a breadcrumb in the
+    # memory tree for the briefer agent to summarize the next morning.
+    "memory_write_chunk",
+    # Discord delivery for state-change escalation.
+    "delegate_do_skill_discord",
+]
+
+[delivery]
+# Where state-change escalations land. Wire after Discord OAuth grants:
+# the daily-progress channel is where everything investor-pipeline-related
+# already routes.
+channels = ["discord:operators"]

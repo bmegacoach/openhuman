@@ -183,8 +183,14 @@ whatsapp-web = ["dep:whatsapp-rust", "dep:whatsapp-rust-tokio-transport", "dep:w
 # Upstream cmake build defaults to /MD but Rust uses /MT.
 # This fork adds config.static_crt(true) to the build script.
 # See: https://github.com/tinyhumansai/openhuman/issues/273
+#
+# SECURITY-HARDENING (bmegacoach fork, 2026-05-15):
+# Pinned to exact SHA rather than tracking the `main` branch. A floating
+# branch means the next `cargo update` pulls whatever's at tip — including a
+# potential malicious commit. Bump after review:
+#   gh api repos/tinyhumansai/whisper-rs-sys/branches/main --jq .commit.sha
 [patch.crates-io]
-whisper-rs-sys = { git = "https://github.com/tinyhumansai/whisper-rs-sys.git", branch = "main" }
+whisper-rs-sys = { git = "https://github.com/tinyhumansai/whisper-rs-sys.git", rev = "229cb4c97e41ca302d3f13b1fa7e93a9b417a5f9" }
 
 # Emit just enough DWARF in release builds for Sentry to symbolicate Rust
 # panics + render surrounding source lines. `line-tables-only` keeps the

@@ -1,0 +1,52 @@
+# CoachAI Pipeline Briefer — Custom OpenHuman agent
+# Drop into ~/.openhuman/agents/coachai_pipeline_briefer.toml after first-run.
+#
+# Purpose: produce the daily investor pipeline summary for the operator.
+# Aggregates from:
+#   - Gmail (investor reply threads, new inquiries)
+#   - Stripe (payment_intent events, subscription tier hits)
+#   - Discord (questions in the operator / investor channels)
+#   - Firestore (accessRequests, accessTokens, investorIntents,
+#     dailyProgress — read via Composio's HTTP-fetch surface since
+#     Firestore isn't a direct Composio integration)
+#   - GitHub (recent commits to bmegacoach/coachai-finance + bmegacoach/chief-system)
+#
+# Read-only Day 1. NEVER writes to Stripe, NEVER sends Gmail on operator's
+# behalf, NEVER modifies Firestore. Just aggregates + summarizes + delivers
+# the briefing to Discord and the Obsidian vault.
+
+id = "coachai_pipeline_briefer"
+display_name = "CoachAI Pipeline Briefer"
+delegate_name = "brief_pipeline"
+when_to_use = "Generate the daily investor pipeline briefing aggregating Gmail inbox + Stripe payment events + Discord investor channels + Firestore intake collections + recent code commits. Run on cron each morning. Read-only — never writes or sends anything."
+
+temperature = 0.4
+max_iterations = 12
+sandbox_mode = "none"
+
+omit_identity = true
+omit_memory_context = false
+omit_safety_preamble = false
+omit_skills_catalog = true
+
+[model]
+hint = "chat"
+
+[tools]
+named = [
+    # Composio read-scoped tool delegations. Each requires the operator
+    # to have OAuth-connected the corresponding toolkit via the desktop
+    # UI before this agent will succeed.
+    "delegate_do_skill_gmail",
+    "delegate_do_skill_stripe",
+    "delegate_do_skill_discord",
+    "delegate_do_skill_github",
+    # Generic HTTP fetch for Firestore REST + on-chain RPC reads.
+    "web_fetch",
+    # Memory writes so the briefing accumulates into the Obsidian vault
+    # under the `daily-briefings/` path automatically.
+    "memory_write_chunk",
+]
+
+[delivery]
+channels = ["discord:operators", "obsidian:daily-briefings"]
