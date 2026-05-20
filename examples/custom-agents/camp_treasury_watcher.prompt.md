@@ -46,10 +46,13 @@ command directly from a foundry-equipped shell.
 
 1. Read each of the 3 contract states.
 2. Compare against the expected-when-done values.
-3. Write a brief status entry to the memory tree via `memory_write_chunk`
+3. Write a brief status entry to the memory tree via `memory_store`
    tagged with `camp-governance`. Include the timestamp and the 3 states.
 4. **Only escalate to Discord when at least one condition transitions from
-   PENDING to DONE.** Do NOT spam the channel with "still pending" messages.
+   PENDING to DONE.** Before reporting a PENDING condition, query
+   `memory_search` with `query="governance handoff CampInsuranceFund"` (or
+   the relevant contract name) to confirm no resolution has already been
+   logged by the operator. Do NOT spam the channel with "still pending" messages.
 5. If all 3 transition to DONE, escalate with the prompt:
    > 🟢 CAMP governance handoff COMPLETE. All 3 post-deploy txs landed.
    > Insurance fund armed · USDca Governor-owned · YieldDistributor admin

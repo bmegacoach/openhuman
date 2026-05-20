@@ -45,7 +45,10 @@ named = [
     "wallet_prepare_contract_call", # read-only simulation use only
     # Memory writes so each watcher run leaves a breadcrumb in the
     # memory tree for the briefer agent to summarize the next morning.
-    "memory_write_chunk",
+    "memory_store",
+    # Memory reads — check whether the operator has already logged each
+    # condition's resolution before reporting it as PENDING.
+    "memory_search",
     # Discord delivery for state-change escalation.
     "delegate_do_skill_discord",
 ]

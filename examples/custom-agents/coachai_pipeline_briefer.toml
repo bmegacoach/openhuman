@@ -45,7 +45,12 @@ named = [
     "web_fetch",
     # Memory writes so the briefing accumulates into the Obsidian vault
     # under the `daily-briefings/` path automatically.
-    "memory_write_chunk",
+    "memory_store",
+    # Memory reads — query the OpenHuman shared substrate before hitting
+    # external sources. Surfaces Penthouse Papi content/marketing writes
+    # AND Flowbook customer/investor comms summaries in one pass.
+    "memory_search",   # semantic search across the full memory tree
+    "memory_recall",   # pull recent writes by recency (catches today's context)
 ]
 
 [delivery]

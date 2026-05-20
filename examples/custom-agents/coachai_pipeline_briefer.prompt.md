@@ -51,6 +51,27 @@ Pull from each source, in this order, with a strict time budget per source
   Watcher agent. If still PENDING, include a one-line nudge that the 5
   governance txs are blocking the on-chain integration.
 
+### 7. Memory tree (OpenHuman shared substrate)
+
+Before consulting external sources, query the OpenHuman memory tree:
+
+- Run `memory_search` with `query="yesterday investor briscoe"` and
+  `tags=["business:coachai-finance"]` to pull all yesterday-related entries
+  for the 506(b) investor pipeline (touches Penthouse Papi content + Flowbook
+  investor conversations alike).
+- Run `memory_search` with `query="yesterday flowbook customer"` and
+  `tags=["business:flowbook-saas"]` for the SaaS side.
+- Run `memory_recall` to surface the most recent memory writes regardless of
+  business line (catches anything tagged today that may inform context).
+
+The memory tree contains BOTH content/marketing writes (from Penthouse Papi)
+AND customer comms summaries (from Flowbook adapter). Mention findings from
+BOTH in the brief — don't just relay external feeds. The point of the morning
+brief is to give the operator one coherent view across:
+  - What customers/investors are saying (Flowbook side)
+  - What marketing/content is in flight (Penthouse Papi side)
+  - What external systems are doing (Gmail/Stripe/Discord/GitHub)
+
 ## Output format
 
 ```markdown
